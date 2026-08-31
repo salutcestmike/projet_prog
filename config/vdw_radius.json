@@ -1,0 +1,51 @@
+[
+    {
+        "group" : "nitrogen",
+        "list" : ["N",
+                "NH",
+                "NH2",
+                "NH3"],
+        "radius" : 1.5
+    },
+    {
+        "group" : "oxygen",
+        "list" : ["O",
+                "O*",
+                "OH"],
+        "radius" : 1.4
+    },
+    {
+        "group" : "sulfur",
+        "list" : ["S",
+                "SH"],
+        "radius" : 1.5
+    },
+    {
+        "group" : "non-aromatic carbon",
+        "list" : ["CH",
+                "CH2",
+                "CH3"],
+        "radius" : 2
+    },
+    {
+        "group" : "aromatic carbon",
+        "list" : ["CH",
+                "C"],
+        "radius" : 1.85
+    },
+    {
+        "group" : "carbonyl and other carbon",
+        "list" : [],
+        "radius" : 1.5
+    },
+    {
+        "group" : "zinc ion",
+        "list" : [],
+        "radius" : 0.74
+    },
+    {
+        "group" : "water",
+        "list" : ["H20"],
+        "radius" : 1.4
+    }
+]
