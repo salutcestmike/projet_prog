@@ -13,14 +13,13 @@ class Atom:
         self.resname = resname
         self.resnum = resnum
         self.coords = coords
-        self.aromatic = resname in ["HIS", "TRP", "TYR", "PHE"] # KEEP ?
+        self.aromatic = resname in ["HIS", "TRP", "TYR", "PHE"]
         self.radius = self.get_radius()
 
     def __str__(self):
         return f"{self.radius} / {self.atom_name} / {self.atom_num} / {self.resname} / {self.resnum} / coords({self.coords[0]}, {self.coords[1]}, {self.coords[2]})"
 
     def get_radius(self):
-        print(self.atom_name[0])
         if self.atom_name[0] == "N":
             return Atom.vdw_radius.get("nitrogen")
         elif self.atom_name[0] == "S":
@@ -33,13 +32,32 @@ class Atom:
             if not(self.aromatic):
                 return Atom.vdw_radius.get("non-aromatic carbon")
             else:
-                if (self.resname == "PHE" and self.atom_name in ["CG", "CD1", "CD2", "CE1", "CE2", "CZ"]) or 
-                   (self.resname == "PHE" and self.atom_name in ["CG", "CD1", "CD2", "CE1", "CE2", "CZ"]) or 
-                   (self.resname == "PHE" and self.atom_name in ["CG", "CD1", "CD2", "CE1", "CE2", "CZ"]) or 
-                   (self.resname == "PHE" and self.atom_name in ["CG", "CD1", "CD2", "CE1", "CE2", "CZ"]): 
-
-                
-            return 2
-            # if self.aromatic:
+                if ((self.resname in ["PHE", "TYR"] and self.atom_name in ["CG", "CD1", "CD2", "CE1", "CE2", "CZ"]) or 
+                   (self.resname == "TRP" and self.atom_name in ["CG", "CD1", "CD2", "CE2", "CE3", "CZ2", "CZ3", "CH2"]) or 
+                   (self.resname == "HIS" and self.atom_name in ["CG", "CD2", "CE1"])): 
+                    return Atom.vdw_radius.get("aromatic carbon")
+                else:
+                    return Atom.vdw_radius.get("non-aromatic carbon")
         return None
-             
+
+    def get_points(self, n_points = 92):
+        radius = self.radius + Atom.vdw_radius.get("water")
+
+        points = []
+        
+        golden_angle = np.pi * (3 - np.sqrt(5))
+    
+        for i in range(n_points):
+    
+            z = (1 - 2 * (i + 0.5) / n_points)
+            r = np.sqrt(1 - z*z) * radius 
+    
+            theta = golden_angle * i
+    
+            x = r * np.cos(theta)
+            y = r * np.sin(theta)
+    
+            points.append([x, y, z * radius])
+    
+        return np.array(points)
+        
