@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import classes.Residu
 
 pdb_file1 = Path("data/pdb/insulin_3I40.pdb")
 pdb_file2 = Path("data/pdb/lysozyme_253L.pdb")
