@@ -1,0 +1,7 @@
+REMARK Source: https://github.com/wesbarnett/OPLS-molecules/blob/master/pdb/benzene/benzene.pdb
+ATOM      1  C1  BEN     1      -2.145   0.973  -0.003  1.00  0.00           C  
+ATOM      3  C2  BEN     1      -2.100   2.367   0.009  1.00  0.00           C  
+ATOM      5  C3  BEN     1      -0.870   3.025   0.012  1.00  0.00           C  
+ATOM      7  C4  BEN     1       0.314   2.290   0.003  1.00  0.00           C  
+ATOM      9  C5  BEN     1       0.270   0.895  -0.009  1.00  0.00           C  
+ATOM     11  C6  BEN     1      -0.959   0.237  -0.012  1.00  0.00           C  

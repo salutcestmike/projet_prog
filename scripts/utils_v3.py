@@ -2,35 +2,41 @@ import numpy as np
 from vedo import Points, Sphere, Plotter, Axes
 
 
-RADIUS = 5
+RADIUS = 1
 
-def fibonacci_sphere(n, radius = RADIUS):
+def sphere_points(n, radius = RADIUS):
+    thetas = []
+    phis = []
     points = []
 
-    golden_angle = np.pi * (3 - np.sqrt(5))
 
-    for i in range(n):
+    for k in range(1, n + 1):
+        hk = -1 + 2 * ((k - 1) / (n - 1))
+        theta = np.arccos(hk)
 
-        z = (1 - 2 * (i + 0.5) / n)
-        r = np.sqrt(1 - z*z) * RADIUS 
+        if ((k == 1) or (k == n)):
+            phi = 0
+        else:
+            phi = (phis[k - 2] + (3.6 / np.sqrt(n)) * (1 / np.sqrt(1 - (hk ** 2)))) % (2*np.pi)
 
-        theta = golden_angle * i
-
-        x = r * np.cos(theta)
-        y = r * np.sin(theta)
-
-        points.append([x, y, z * RADIUS])
-
+        thetas.append(theta)
+        phis.append(phi)
+        points.append([np.sin(theta) * np.cos(phi) * radius,
+                       np.sin(theta) * np.sin(phi) * radius, 
+                       np.cos(theta) * radius])
+    print(thetas)
+    print(len(phis))
     return np.array(points)
 
 
 
-points = fibonacci_sphere(92)
-print("Nombre de points :", len(points))
+points = sphere_points(92)
 print(points)
-# Affichage
-for i, (x, y, z) in enumerate(points, start=1):
-    print(f"{i:3d}  {x: .6f}  {y: .6f}  {z: .6f}")
+print("Nombre de points :", len(points))
+
+# # Affichage
+# for i, (x, y, z) in enumerate(points, start=1):
+#     print(f"{i:3d}  {x: .6f}  {y: .6f}  {z: .6f}")
 
 
 # ============================================
@@ -40,7 +46,7 @@ for i, (x, y, z) in enumerate(points, start=1):
 pts = Points(
     points,
     r=10,
-    c="r4ed"
+    c="red"
 )
 
 
