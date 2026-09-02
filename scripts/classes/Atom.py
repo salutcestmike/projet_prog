@@ -58,7 +58,7 @@ class Atom:
             x = r * np.cos(theta)
             y = r * np.sin(theta)
     
-            points.append([x, y, z * radius])
+            points.append([x + self.coords[0], y + self.coords[1], z * radius + self.coords[2]])
     
         return np.array(points)
 
@@ -80,9 +80,9 @@ class Atom:
 
             thetas.append(theta)
             phis.append(phi)
-            points.append([np.sin(theta) * np.cos(phi) * radius,
-                        np.sin(theta) * np.sin(phi) * radius, 
-                        np.cos(theta) * radius])
+            points.append([np.sin(theta) * np.cos(phi) * radius + self.coords[0],
+                        np.sin(theta) * np.sin(phi) * radius + self.coords[1], 
+                        np.cos(theta) * radius + self.coords[2]])
         return np.array(points)
 
 def eucl_dist(coords1, coords2):

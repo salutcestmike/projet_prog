@@ -42,9 +42,10 @@ class Protein:
             for j in range(len(self.atoms)):
                 if (self.neighbor_table[i, j]):
                     is_covered_table = np.zeros(n_points).astype(bool)
-                    for point in self.atoms[i].get_points_v2(n_points):
-                        if eucl_dist(point, self.atoms[j].coords) < self.atoms[j].radius + Atom.vdw_radius.get("water"):
-                            is_covered_table[i] = True
+                    sphere_points = self.atoms[i].get_points_v2(n_points)
+                    for k in range(len(sphere_points)):
+                        if eucl_dist(sphere_points[k], self.atoms[j].coords) < self.atoms[j].radius + Atom.vdw_radius.get("water"):
+                            is_covered_table[k] = True
                             continue
                     self.atoms[i].inaccessible_points = np.count_nonzero(is_covered_table)
                     self.inaccessible_points += np.count_nonzero(is_covered_table)

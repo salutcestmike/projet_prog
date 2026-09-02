@@ -11,7 +11,7 @@ if __name__ == "__main__":
     atoms = []
     atoms_type = []
 
-    with open(pdb_file_test, "r") as f:
+    with open(pdb_file2, "r") as f:
         for line in f:
             if line.startswith(("ATOM")):
                 atoms.append(line.strip())
@@ -26,9 +26,19 @@ if __name__ == "__main__":
     print(prot.count_inaccessible_points())
     print(prot.get_accessible_surface())
 
+    points = []
+    for atom in prot.atoms:
+        points.extend(atom.get_points_v2())
+
+    pts = Points(
+        points,
+        r=10,
+        c="red"
+    )
+
     spheres = [Sphere(
         pos=atom.coords,
-        r=atom.radius
+        r=atom.radius + 1.4
     ).alpha(0.15).c("black" if (atom.atom_name[0] == "C") 
                             else ("blue" if (atom.atom_name[0] == "N") 
                                   else ("red" if (atom.atom_name[0] == "O") else "yellow"))) for atom in prot.atoms]
@@ -46,6 +56,7 @@ if __name__ == "__main__":
 
     plotter.show(
         spheres,
+        pts,
         axes,
         viewup="z",
         interactive=True
