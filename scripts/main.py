@@ -4,14 +4,16 @@ from vedo import Points, Sphere, Plotter, Axes
 
 
 if __name__ == "__main__":
-    pdb_file_test = Path("data/pdb/benzene.pdb")
+    pdb_file_test1 = Path("data/pdb/test.pdb")
+    pdb_file_test2 = Path("data/pdb/benzene.pdb")
     pdb_file1 = Path("data/pdb/insulin_3I40.pdb")
     pdb_file2 = Path("data/pdb/lysozyme_253L.pdb")
+    pdb_file3 = Path("data/pdb/lysozyme_1GWD.pdb")
 
     atoms = []
     atoms_type = []
 
-    with open(pdb_file2, "r") as f:
+    with open(pdb_file_test1, "r") as f:
         for line in f:
             if line.startswith(("ATOM")):
                 atoms.append(line.strip())
@@ -23,8 +25,12 @@ if __name__ == "__main__":
     print(set(atoms_type))
     print(prot.neighbor_table)
 
-    print(prot.count_inaccessible_points())
-    print(prot.get_accessible_surface())
+    inaccessible_points = prot.count_inaccessible_points()
+    accessible_surface = prot.get_accessible_surface()
+    print(f"Number of atoms: {len(prot.atoms)}")
+    print(f"Number of inaccessible points: {inaccessible_points}")
+    print(f"{100 * inaccessible_points / (len(prot.atoms) * 92)}% of points are inaccessible")
+    print(accessible_surface)
 
     points = []
     for atom in prot.atoms:
