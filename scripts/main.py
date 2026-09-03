@@ -3,24 +3,27 @@ from classes.Protein import Protein, Atom
 from vedo import Points, Sphere, Plotter, Axes
 
 
+
 if __name__ == "__main__":
+    n_points = 92
     pdb_file_test1 = Path("data/pdb/test.pdb")
     pdb_file_test2 = Path("data/pdb/benzene.pdb")
     pdb_file1 = Path("data/pdb/insulin_3I40.pdb")
     pdb_file2 = Path("data/pdb/lysozyme_253L.pdb")
     pdb_file3 = Path("data/pdb/lysozyme_1GWD.pdb")
+    pdb_file4 = Path("data/pdb/1MH1.pdb")
 
     atoms = []
     atoms_type = []
 
-    with open(pdb_file_test2, "r") as f:
+    with open(pdb_file2, "r") as f:
         for line in f:
             if line.startswith(("ATOM")):
                 atoms.append(line.strip())
                 atoms_type.append(line[12:16].strip())
 
     [print(a) for a in atoms]
-    prot = Protein("insulin", atoms)
+    prot = Protein("insulin", atoms, n_points)
     print(prot)
     print(set(atoms_type))
     print(prot.neighbor_table)
@@ -29,12 +32,13 @@ if __name__ == "__main__":
     accessible_surface = prot.get_accessible_surface()
     print(f"Number of atoms: {len(prot.atoms)}")
     print(f"Number of inaccessible points: {inaccessible_points}")
-    print(f"{100 * inaccessible_points / (len(prot.atoms) * 92)}% of points are inaccessible")
+    print(f"{100 * inaccessible_points / (len(prot.atoms) * n_points)}% of points are inaccessible")
     print(accessible_surface)
-
+    print(prot.get_max_surface())
+    
     points = []
     for atom in prot.atoms:
-        points.extend(atom.accessible_points)
+        points.extend(atom.accessible_points_list)
 
     pts = Points(
         points,

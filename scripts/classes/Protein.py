@@ -5,8 +5,9 @@ import numpy as np
 
 class Protein:
 
-    def __init__(self, prot_name, atoms):
+    def __init__(self, prot_name, atoms, n_points):
         self.prot_name = prot_name
+        self.n_points = n_points
         self.atoms = self.generate_atoms(atoms)
         self.accessible_points = 0
         self.neighbor_table = self.generate_neighbor_table()
@@ -35,7 +36,9 @@ class Protein:
         self.neighbor_table = table
         return table
     
-    def count_inaccessible_points(self, n_points = 92):
+    def count_inaccessible_points(self, n_points = None):
+        if n_points is None:
+            n_points = self.n_points
         self.inaccessible_points = 0
 
         for i in tqdm(range(len(self.atoms))):
@@ -49,15 +52,26 @@ class Protein:
                             continue
             self.atoms[i].inaccessible_points = np.count_nonzero(is_covered_table)
             for j in range(len(sphere_points)):
-                if not(is_covered_table[j]):
-                    self.atoms[i].accessible_points.append(sphere_points[j])
+                if is_covered_table[j]:
+                    self.atoms[i].inaccessible_points_list.append(sphere_points[j])
+                else:
+                    self.atoms[i].accessible_points_list.append(sphere_points[j])
             self.inaccessible_points += np.count_nonzero(is_covered_table)
 
         return self.inaccessible_points
     
-    def get_accessible_surface(self, n = 92):
+    def get_accessible_surface(self, n_points = None):
+        if n_points is None:
+            n_points = self.n_points
+            
         self.accessible_surface = 0
 
         for atom in self.atoms:
-            self.accessible_surface += (n - atom.inaccessible_points) * 4 * np.pi * (atom.radius ** 2) / n
+            self.accessible_surface += (n_points - atom.inaccessible_points) * 4 * np.pi * (atom.radius ** 2) / n_points
         return self.accessible_surface
+
+    def get_max_surface(self):
+        max_surface = 0
+        for atom in self.atoms:
+            max_surface += 4 * np.pi * (atom.radius ** 2) 
+        return max_surface

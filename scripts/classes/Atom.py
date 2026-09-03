@@ -16,7 +16,8 @@ class Atom:
         self.aromatic = resname in ["HIS", "TRP", "TYR", "PHE"]
         self.radius = self.get_radius()
         self.inaccessible_points = 0
-        self.accessible_points = []
+        self.accessible_points_list = []
+        self.inaccessible_points_list = []
 
     def __str__(self):
         return f"{self.radius} / {self.atom_name} / {self.atom_num} / {self.resname} / {self.resnum} / coords({self.coords[0]}, {self.coords[1]}, {self.coords[2]})"
@@ -63,21 +64,21 @@ class Atom:
     
         return np.array(points)
 
-    def get_points_v2(self, n = 92):
+    def get_points_v2(self, n_points = 92):
         radius = self.radius + Atom.vdw_radius.get("water")
 
         thetas = []
         phis = []
         points = []
 
-        for k in range(1, n + 1):
-            hk = -1 + 2 * ((k - 1) / (n - 1))
+        for k in range(1, n_points + 1):
+            hk = -1 + 2 * ((k - 1) / (n_points - 1))
             theta = np.arccos(hk)
 
-            if ((k == 1) or (k == n)):
+            if ((k == 1) or (k == n_points)):
                 phi = 0
             else:
-                phi = (phis[k - 2] + (3.6 / np.sqrt(n)) * (1 / np.sqrt(1 - (hk ** 2)))) % (2*np.pi)
+                phi = (phis[k - 2] + (3.6 / np.sqrt(n_points)) * (1 / np.sqrt(1 - (hk ** 2)))) % (2*np.pi)
 
             thetas.append(theta)
             phis.append(phi)
