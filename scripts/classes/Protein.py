@@ -43,7 +43,7 @@ class Protein:
 
         for i in tqdm(range(len(self.atoms))):
             is_covered_table = np.zeros(n_points).astype(bool)
-            sphere_points = self.atoms[i].get_points_v2(n_points)
+            sphere_points = self.atoms[i].get_points(n_points)
             for j in range(len(self.atoms)):
                 if (self.neighbor_table[i, j]):
                     for k in range(len(sphere_points)):

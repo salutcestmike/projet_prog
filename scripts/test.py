@@ -1,4 +1,5 @@
 import numpy as np
+import freesasa
 
 def surface(atom1, atom2, radius1, radius2):
     dist = np.sqrt((atom1[0] - atom2[0])** 2 + 
@@ -15,3 +16,13 @@ radius1 = 2
 radius2 = 2
 
 print(surface(atom1, atom2, radius1, radius2))
+
+
+structure = freesasa.Structure("data/pdb/lysozyme_253L.pdb")
+structure = freesasa.Structure("data/pdb/benzene.pdb")
+result = freesasa.calc(structure)
+area_classes = freesasa.classifyResults(result, structure)
+
+print("Total : %.2f A2" % result.totalArea())
+for key in area_classes:
+    print(key, ": %.2f A2" % area_classes[key])

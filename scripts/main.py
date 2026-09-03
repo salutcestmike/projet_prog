@@ -16,7 +16,7 @@ if __name__ == "__main__":
     atoms = []
     atoms_type = []
 
-    with open(pdb_file2, "r") as f:
+    with open(pdb_file1, "r") as f:
         for line in f:
             if line.startswith(("ATOM")):
                 atoms.append(line.strip())

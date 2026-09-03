@@ -43,28 +43,7 @@ class Atom:
                     return Atom.vdw_radius.get("non-aromatic carbon")
         return None
 
-    def get_points_v1(self, n_points = 92):
-        radius = self.radius + Atom.vdw_radius.get("water")
-
-        points = []
-        
-        golden_angle = np.pi * (3 - np.sqrt(5))
-    
-        for i in range(n_points):
-    
-            z = (1 - 2 * (i + 0.5) / n_points)
-            r = np.sqrt(1 - z*z) * radius 
-    
-            theta = golden_angle * i
-    
-            x = r * np.cos(theta)
-            y = r * np.sin(theta)
-    
-            points.append([x + self.coords[0], y + self.coords[1], z * radius + self.coords[2]])
-    
-        return np.array(points)
-
-    def get_points_v2(self, n_points = 92):
+    def get_points(self, n_points = 92):
         radius = self.radius + Atom.vdw_radius.get("water")
 
         thetas = []
