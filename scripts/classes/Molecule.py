@@ -3,7 +3,7 @@ from tqdm import tqdm
 import numpy as np
 
 
-class Protein:
+class Molecule:
 
     def __init__(self, prot_name, atoms, n_points):
         self.prot_name = prot_name

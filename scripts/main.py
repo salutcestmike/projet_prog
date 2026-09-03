@@ -1,5 +1,5 @@
 from pathlib import Path
-from classes.Protein import Protein, Atom
+from classes.Molecule import Molecule, Atom
 from vedo import Points, Sphere, Plotter, Axes
 
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
                 atoms_type.append(line[12:16].strip())
 
     [print(a) for a in atoms]
-    prot = Protein("insulin", atoms, n_points)
+    prot = Molecule("insulin", atoms, n_points)
     print(prot)
     print(set(atoms_type))
     print(prot.neighbor_table)
