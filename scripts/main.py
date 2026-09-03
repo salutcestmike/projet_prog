@@ -35,6 +35,10 @@ if __name__ == "__main__":
     print(f"{100 * inaccessible_points / (len(prot.atoms) * n_points)}% of points are inaccessible")
     print(accessible_surface)
     print(prot.get_max_surface())
+
+    with open("res.txt", 'w') as f:
+        for atom in prot.atoms:
+            f.write(f"{atom.atom_num} / {atom.atom_name} / {100 * len(atom.accessible_points_list) / n_points}%\n")
     
     points = []
     for atom in prot.atoms:
