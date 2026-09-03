@@ -16,6 +16,7 @@ class Atom:
         self.aromatic = resname in ["HIS", "TRP", "TYR", "PHE"]
         self.radius = self.get_radius()
         self.inaccessible_points = 0
+        self.accessible_points = []
 
     def __str__(self):
         return f"{self.radius} / {self.atom_name} / {self.atom_num} / {self.resname} / {self.resnum} / coords({self.coords[0]}, {self.coords[1]}, {self.coords[2]})"

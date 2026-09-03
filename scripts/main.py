@@ -1,5 +1,5 @@
 from pathlib import Path
-from classes.Protein import Protein
+from classes.Protein import Protein, Atom
 from vedo import Points, Sphere, Plotter, Axes
 
 
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     atoms = []
     atoms_type = []
 
-    with open(pdb_file_test1, "r") as f:
+    with open(pdb_file_test2, "r") as f:
         for line in f:
             if line.startswith(("ATOM")):
                 atoms.append(line.strip())
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     points = []
     for atom in prot.atoms:
-        points.extend(atom.get_points_v2())
+        points.extend(atom.accessible_points)
 
     pts = Points(
         points,
@@ -44,10 +44,16 @@ if __name__ == "__main__":
 
     spheres = [Sphere(
         pos=atom.coords,
-        r=atom.radius + 1.4
+        r=atom.radius + Atom.vdw_radius.get("water")
     ).alpha(0.15).c("black" if (atom.atom_name[0] == "C") 
                             else ("blue" if (atom.atom_name[0] == "N") 
                                   else ("red" if (atom.atom_name[0] == "O") else "yellow"))) for atom in prot.atoms]
+
+    spheres = [Sphere(
+            pos=atom.coords,
+            r=atom.radius + Atom.vdw_radius.get("water")
+        ).alpha(0.15).c("grey") for atom in prot.atoms]
+    
 
     axes = Axes(
         xtitle="X",
@@ -63,7 +69,7 @@ if __name__ == "__main__":
     plotter.show(
         spheres,
         pts,
-        axes,
+        axes = 1,
         viewup="z",
         interactive=True
     )

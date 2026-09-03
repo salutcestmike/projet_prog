@@ -48,6 +48,9 @@ class Protein:
                             is_covered_table[k] = True
                             continue
             self.atoms[i].inaccessible_points = np.count_nonzero(is_covered_table)
+            for j in range(len(sphere_points)):
+                if not(is_covered_table[j]):
+                    self.atoms[i].accessible_points.append(sphere_points[j])
             self.inaccessible_points += np.count_nonzero(is_covered_table)
 
         return self.inaccessible_points
