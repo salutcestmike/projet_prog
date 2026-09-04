@@ -7,12 +7,11 @@ class Atom:
     with open('config/vdw_radius.json') as f:
         vdw_radius = json.load(f)
 
-    def __init__(self, atom_num, atom_name, resname, resnum, coords):
+    def __init__(self, atom_num, atom_name, resname, coords):
         self.atom_num = atom_num
         self.atom_name = atom_name
-        self.resname = resname
-        self.resnum = resnum
         self.coords = coords
+        self.resname = resname
         self.aromatic = resname in ["HIS", "TRP", "TYR", "PHE"]
         self.radius = self.get_radius()
         self.accessible_points_list = None
@@ -67,6 +66,3 @@ class Atom:
 
     def get_accessible_surface(self, n_points):
         return ((len(self.accessible_points_list) * 4 * np.pi * ((self.radius + Atom.vdw_radius.get("water")) ** 2)) / n_points)
-
-def eucl_dist(coords1, coords2):
-    return np.sqrt((coords1[0] - coords2[0]) ** 2 + (coords1[1] - coords2[1]) ** 2 + (coords1[2] - coords2[2]) ** 2)

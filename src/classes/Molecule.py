@@ -1,12 +1,32 @@
-from classes.Atom import Atom, eucl_dist
+from classes.Residu import Residu, Atom
 from tqdm import tqdm
 import numpy as np
 from multiprocessing import Pool, cpu_count
+from numba import njit
+
+
+@njit
+def generate_neighbor_table_numba(coords, radii, water_radius):
+    n = len(coords)
+    table = np.zeros((n, n), dtype=np.bool)
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            dx = coords[i][0] - coords[j][0]
+            dy = coords[i][1] - coords[j][1]
+            dz = coords[i][2] - coords[j][2]
+            distance = dx*dx + dy*dy + dz*dz
+            threshold = 2 * water_radius + radii[i] + radii[j]
+
+            table[i][j] = distance < threshold * threshold
+            table[j][i] = table[i][j]
+
+    return table
 
 class Molecule:
 
-    def __init__(self, prot_name, atoms, n_points):
-        self.prot_name = prot_name
+    def __init__(self, name, atoms, n_points):
+        self.name = name
         self.n_points = n_points
         self.atoms = self.generate_atoms(atoms)
         self.neighbor_table = self.generate_neighbor_table()
@@ -25,12 +45,9 @@ class Molecule:
         return chaine
 
     def generate_neighbor_table(self):
-        table = np.zeros((len(self.atoms), len(self.atoms))).astype(bool)
-        for i in tqdm(range(len(self.atoms))):
-            for j in range(i + 1, len(self.atoms)):
-                table[i][j] = eucl_dist(self.atoms[i].coords, self.atoms[j].coords) < (2 * Atom.vdw_radius.get("water") + self.atoms[i].radius + self.atoms[j].radius)
-                table[j][i] = table[i][j]
-        return table
+        coords = np.asarray([atom.coords for atom in self.atoms], dtype=np.float64)
+        radii = np.asarray([atom.radius for atom in self.atoms], dtype=np.float64)
+        return generate_neighbor_table_numba(coords, radii, Atom.vdw_radius["water"])
 
     def compute_accessible_points(self, n_points = None):
         if n_points is None:
@@ -49,7 +66,7 @@ class Molecule:
                 if (self.neighbor_table[i, j]):
                     distances = np.linalg.norm(sphere_points - np.array(self.atoms[j].coords), axis=1)
                     is_covered_table = is_covered_table | (distances < self.atoms[j].radius + Atom.vdw_radius["water"])
-                    
+
             for j in range(len(sphere_points)):
                 if is_covered_table[j]:
                     self.atoms[i].inaccessible_points_list.append(sphere_points[j])

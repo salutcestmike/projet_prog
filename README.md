@@ -1,3 +1,4 @@
 tqdm
 numpy
 vedo
+numba
