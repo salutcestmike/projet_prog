@@ -2,6 +2,7 @@ from pathlib import Path
 from classes.Molecule import Molecule, Atom
 from vedo import Points, Sphere, Plotter, Axes
 import argparse
+from datetime import datetime
 
 
 
@@ -22,7 +23,7 @@ def getArgs():
     if not input.exists():
         raise ValueError("Input folder/file does not exist")
 
-    output_folder.parent.mkdir(parents=True, exist_ok=True)
+    output_folder.mkdir(parents=True, exist_ok=True)
 
     return {
         "input": input,
@@ -36,6 +37,10 @@ def getArgs():
 if __name__ == "__main__":
 
     args = getArgs()
+
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_folder = Path(f"{args.get("output_folder")}/{timestamp}")
+    output_folder.mkdir(parents=True, exist_ok=True)
 
     files_to_process = []
     if args.get("input").is_file():
@@ -66,8 +71,8 @@ if __name__ == "__main__":
         print(f"{round(100 * inaccessible_points / (len(molecule.atoms) * n_points), 2)}% of points are inaccessible")
         print(f"Accessible surface: {accessible_surface} Å2")
         print(f"Max surface: {round(molecule.get_max_surface(), 2)}Å2")
-    
-        with open(f"{args.get("output_folder")}/{file.stem}.txt", 'w') as f:
+
+        with open(f"{output_folder}/{file.stem}.txt", 'w') as f:
             for atom in molecule.atoms:
                 f.write(f"{atom.atom_num} / {atom.atom_name} / {100 * len(atom.accessible_points_list) / n_points}%\n")
 
