@@ -67,11 +67,11 @@ class Molecule:
         self.accessible_surface = 0
 
         for atom in self.atoms:
-            self.accessible_surface += (n_points - atom.inaccessible_points) * 4 * np.pi * (atom.radius ** 2) / n_points
+            self.accessible_surface += (((n_points - atom.inaccessible_points) * 4 * np.pi * ((atom.radius + Atom.vdw_radius.get("water")) ** 2)) / n_points)
         return self.accessible_surface
 
     def get_max_surface(self):
         max_surface = 0
         for atom in self.atoms:
-            max_surface += 4 * np.pi * (atom.radius ** 2) 
+            max_surface += 4 * np.pi * ((atom.radius + Atom.vdw_radius.get("water")) ** 2) 
         return max_surface

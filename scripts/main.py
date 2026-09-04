@@ -1,10 +1,51 @@
 from pathlib import Path
 from classes.Molecule import Molecule, Atom
 from vedo import Points, Sphere, Plotter, Axes
+import argparse
 
+
+
+def getArgs():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-i", "--pdb_folder_or_file", required=True, type=str)
+    parser.add_argument("-o", "--output_folder", required=True, type=str)
+    parser.add_argument("-w", "--num_workers", required=True, type=int)
+    parser.add_argument("-n", "--n_sphere_points", required=True, type=int)
+    parser.add_argument("-d", "--display_molecule", action="store_true")
+
+    args = parser.parse_args()
+
+    input = Path(args.pdb_folder_or_file)
+    output_folder = Path(args.output_folder)
+
+    if not input.exists():
+        raise ValueError("Input folder/file does not exist")
+
+    output_folder.parent.mkdir(parents=True, exist_ok=True)
+
+    return {
+        "input": input,
+        "output_file": output_folder,
+        "num_workers": int(args.num_workers),
+        "n_sphere_points": int(args.n_sphere_points),
+        "display_molecule": args.display_molecule if input.is_file() else False
+    }
 
 
 if __name__ == "__main__":
+
+    args = getArgs()
+
+    files_to_process = []
+    if args.get("input").is_file():
+        files_to_process.append(args.get("input"))
+    else:
+        files_to_process = list(args.get("input").glob("*.pdb"))
+    print(f"Files to process:")
+    [print(f"{file}\n") for file in files_to_process]
+
+
     n_points = 92
     pdb_file_test1 = Path("data/pdb/test.pdb")
     pdb_file_test2 = Path("data/pdb/benzene.pdb")
@@ -16,7 +57,7 @@ if __name__ == "__main__":
     atoms = []
     atoms_type = []
 
-    with open(pdb_file1, "r") as f:
+    with open(pdb_file2, "r") as f:
         for line in f:
             if line.startswith(("ATOM")):
                 atoms.append(line.strip())
