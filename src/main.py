@@ -34,7 +34,6 @@ def getArgs():
     }
 
 
-
 if __name__ == "__main__":
 
     args = getArgs()
@@ -57,7 +56,6 @@ if __name__ == "__main__":
 
     for file in files_to_process:
         atoms = []
-
         with open(file, "r") as f:
             for line in f:
                 if line.startswith(("ATOM")) and (line[77].strip() != "H"):
@@ -68,7 +66,6 @@ if __name__ == "__main__":
         resname = None
         chain = None
         for atom in atoms:
-            print(chain)
             if int(atom[23:26]) != resnum:
                 residues[len(residues) - 1] = Residu(resnum, resname, atom[21], residues[len(residues) - 1])
                 residues.append([])
@@ -80,59 +77,46 @@ if __name__ == "__main__":
             residues[len(residues) - 1].append(Atom(int(atom[6:11]),
                                              atom[12:16].strip(), 
                                              resname,
-                                             [float(atom[30:38]), float(atom[39:46]), float(atom[47:54])]) for atom in atoms)
+                                             [float(atom[30:38]), float(atom[39:46]), float(atom[47:54])]))
         residues[len(residues) - 1] = Residu(resnum, resname, atom[21], residues[len(residues) - 1])
-        [print(str(residue)) for residue in residues]
-    
-        # molecule = Molecule(file.stem, atoms, n_points)
-        # accessible_points_count, inaccessible_points_count = molecule.compute_accessible_points(n_points)
 
-        # print(f"Molecule: {molecule.name}")
-        # print(f"Number of atoms: {len(molecule.atoms)}")
-        # print(f"Number of accessible points: {accessible_points_count}")
-        # print(f"Number of inaccessible points: {inaccessible_points_count}")
-        # print(f"{round(100 * accessible_points_count / (len(molecule.atoms) * n_points), 2)}% of points are accessible")
-        # print(f"Accessible surface: {molecule.get_accessible_surface()} Å2")
-        # print(f"Max surface: {round(molecule.get_max_surface(), 2)} Å2\n")
+        molecule = Molecule(file.stem, n_points, residues)
+        accessible_points_count, inaccessible_points_count = molecule.compute_accessible_points(n_points)
 
-        # with open(f"{output_folder}/{file.stem}.txt", 'w') as f:
-        #     for atom in molecule.atoms:
-        #         f.write(f"{atom.atom_num} / {atom.atom_name} / {100 * len(atom.accessible_points_list) / n_points}%\n")
+        print(f"Molecule: {molecule.name}")
+        print(f"Number of residues: {len(molecule.residues)}")
+        print(f"Number of atoms: {len(atoms)}")
+        print(f"Number of accessible points: {accessible_points_count}")
+        print(f"Number of inaccessible points: {inaccessible_points_count}")
 
-        # if display:
-        #     display = False
+        chains = list(set([atom[21] for atom in atoms]))
+        chains.sort()
+        for chain in chains:
+            accessible_surface = molecule.get_accessible_surface(n_points, chain)
+            max_accessible_surface = molecule.get_max_surface(chain)
+            print(f"Chain {chain} accessible surface: {round(accessible_surface, 2)} Å^2")
+            print(f"Chain {chain} accessible percentage: {round(100 * accessible_surface / max_accessible_surface, 2)} %")
 
-        #     accessible_points = []
-        #     for atom in molecule.atoms:
-        #         accessible_points.extend(atom.accessible_points_list)
+        print(f"Total accessible surface: {round(molecule.get_accessible_surface(), 2)} Å^2")
+        print(f"Total accessible percentage: {round(100 * accessible_points_count / (len(atoms) * n_points), 2)} %")
+
+        with open(f"{output_folder}/{file.stem}.txt", 'w') as f:
+            for residue in residues:
+                for atom in residue.atoms:
+                    f.write(f"{atom.atom_num} / {atom.atom_name} / {100 * len(atom.accessible_points_list) / n_points} %\n")
+
+        if display:
+            display = False
+
+            accessible_points = []
+            for atom in atoms:
+                accessible_points.extend(atom.accessible_points_list)
             
-        #     pts = Points(
-        #         accessible_points,
-        #         r=10,
-        #         c="red"
-        #     )
-        
-        #     spheres = [Sphere(
-        #             pos=atom.coords,
-        #             r=atom.radius + Atom.vdw_radius.get("water")
-        #         ).alpha(0.15).c("grey") for atom in molecule.atoms]
+            pts = Points(accessible_points, r=10, c="red")
+            spheres = [Sphere(pos=atom.coords, r=atom.radius + Atom.vdw_radius.get("water"))
+                       .alpha(0.15)
+                       .c("grey") for atom in atoms]
             
-        
-        #     axes = Axes(
-        #         xtitle="X",
-        #         ytitle="Y",
-        #         ztitle="Z"
-        #     )
-        
-        #     plotter = Plotter(
-        #         axes=axes,
-        #         bg="white"
-        #     )
-        
-        #     plotter.show(
-        #         spheres,
-        #         pts,
-        #         axes = 1,
-        #         viewup="z",
-        #         interactive=True
-        #     )
+            axes = Axes(xtitle = "X", ytitle = "Y", ztitle = "Z")
+            plotter = Plotter(axes = axes, bg = "white")
+            plotter.show(spheres, pts, axes = 1, viewup = "z", interactive = True)
