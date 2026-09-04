@@ -7,8 +7,7 @@ conda activate projet_prog
 python3 -u ./src/main.py \
     -i data/pdb/lysozyme_253L.pdb \
     -o output/results \
-    -w 3 \
-    -n 92 \
-    -d 
+    -w 8 \
+    -n 92 
 
 conda deactivate

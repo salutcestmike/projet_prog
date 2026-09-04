@@ -1,7 +1,7 @@
 from classes.Atom import Atom, eucl_dist
 from tqdm import tqdm
 import numpy as np
-
+from multiprocessing import Pool, cpu_count
 
 class Molecule:
 
@@ -43,7 +43,7 @@ class Molecule:
             self.atoms[i].accessible_points_list = []
             self.atoms[i].inaccessible_points_list = []
             is_covered_table = np.zeros(n_points).astype(bool)
-            sphere_points = self.atoms[i].get_points(n_points)
+            sphere_points = np.array(self.atoms[i].get_points(n_points))
 
             for j in range(len(self.atoms)):
                 if (self.neighbor_table[i, j]):
