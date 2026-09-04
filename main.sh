@@ -4,9 +4,9 @@ source ~/miniconda3/etc/profile.d/conda.sh
 
 conda activate projet_prog
 
-python3 -u ./scripts/main.py \
+python3 -u ./src/main.py \
     -i data/pdb/lysozyme_253L.pdb \
-    -o output/surfaces \
+    -o output/results \
     -w 3 \
     -n 92 \
     -d 
