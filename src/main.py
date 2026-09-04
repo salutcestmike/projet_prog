@@ -11,7 +11,6 @@ def getArgs():
 
     parser.add_argument("-i", "--pdb_folder_or_file", required=True, type=str)
     parser.add_argument("-o", "--output_folder", required=True, type=str)
-    parser.add_argument("-w", "--num_workers", required=True, type=int)
     parser.add_argument("-n", "--n_sphere_points", required=True, type=int)
     parser.add_argument("-d", "--display_molecule", action="store_true")
 

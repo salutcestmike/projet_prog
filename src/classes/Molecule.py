@@ -1,7 +1,6 @@
 from classes.Residu import Residu, Atom
 from tqdm import tqdm
 import numpy as np
-from multiprocessing import Pool, cpu_count
 from numba import njit
 
 
