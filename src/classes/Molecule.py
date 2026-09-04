@@ -47,11 +47,9 @@ class Molecule:
 
             for j in range(len(self.atoms)):
                 if (self.neighbor_table[i, j]):
-                    for k in range(len(sphere_points)):
-                        if eucl_dist(sphere_points[k], self.atoms[j].coords) < self.atoms[j].radius + Atom.vdw_radius.get("water"):
-                            is_covered_table[k] = True
-                            continue
-
+                    distances = np.linalg.norm(sphere_points - np.array(self.atoms[j].coords), axis=1)
+                    is_covered_table = is_covered_table | (distances < self.atoms[j].radius + Atom.vdw_radius["water"])
+                    
             for j in range(len(sphere_points)):
                 if is_covered_table[j]:
                     self.atoms[i].inaccessible_points_list.append(sphere_points[j])

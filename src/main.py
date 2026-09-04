@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
         with open(file, "r") as f:
             for line in f:
-                if line.startswith(("ATOM")):
+                if line.startswith(("ATOM")) and (line[77].strip() != "H"):
                     atoms.append(line.strip())
                     atoms_type.append(line[12:16].strip())
     
