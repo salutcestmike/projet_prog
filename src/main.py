@@ -62,15 +62,14 @@ if __name__ == "__main__":
                     atoms_type.append(line[12:16].strip())
     
         molecule = Molecule(file.stem, atoms, n_points)
-        inaccessible_points = molecule.count_inaccessible_points()
-        accessible_surface = molecule.get_accessible_surface()
-        
+        accessible_points_count, inaccessible_points_count = molecule.compute_accessible_points(n_points)
+
         print(f"Number of atoms: {len(molecule.atoms)}")
-        print(f"Number of accessible points: {len(molecule.atoms) * n_points - inaccessible_points}")
-        print(f"Number of inaccessible points: {inaccessible_points}")
-        print(f"{round(100 * inaccessible_points / (len(molecule.atoms) * n_points), 2)}% of points are inaccessible")
-        print(f"Accessible surface: {accessible_surface} Å2")
-        print(f"Max surface: {round(molecule.get_max_surface(), 2)}Å2")
+        print(f"Number of accessible points: {accessible_points_count}")
+        print(f"Number of inaccessible points: {inaccessible_points_count}")
+        print(f"{round(100 * accessible_points_count / (len(molecule.atoms) * n_points), 2)}% of points are accessible")
+        print(f"Accessible surface: {molecule.get_accessible_surface()} Å2")
+        print(f"Max surface: {round(molecule.get_max_surface(), 2)} Å2")
 
         with open(f"{output_folder}/{file.stem}.txt", 'w') as f:
             for atom in molecule.atoms:

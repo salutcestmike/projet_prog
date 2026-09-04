@@ -9,10 +9,7 @@ class Molecule:
         self.prot_name = prot_name
         self.n_points = n_points
         self.atoms = self.generate_atoms(atoms)
-        self.accessible_points = 0
         self.neighbor_table = self.generate_neighbor_table()
-        self.inaccessible_points = 0
-        self.accessible_surface = 0
 
     def generate_atoms(self, atoms):
         return [Atom(int(atom[6:11]),
@@ -33,42 +30,53 @@ class Molecule:
             for j in range(i + 1, len(self.atoms)):
                 table[i][j] = eucl_dist(self.atoms[i].coords, self.atoms[j].coords) < (2 * Atom.vdw_radius.get("water") + self.atoms[i].radius + self.atoms[j].radius)
                 table[j][i] = table[i][j]
-        self.neighbor_table = table
         return table
-    
-    def count_inaccessible_points(self, n_points = None):
+
+    def compute_accessible_points(self, n_points = None):
         if n_points is None:
             n_points = self.n_points
-        self.inaccessible_points = 0
+
+        accessible_points_count = 0
+        inaccessible_points_count = 0
 
         for i in tqdm(range(len(self.atoms))):
+            self.atoms[i].accessible_points_list = []
+            self.atoms[i].inaccessible_points_list = []
             is_covered_table = np.zeros(n_points).astype(bool)
             sphere_points = self.atoms[i].get_points(n_points)
+
             for j in range(len(self.atoms)):
                 if (self.neighbor_table[i, j]):
                     for k in range(len(sphere_points)):
                         if eucl_dist(sphere_points[k], self.atoms[j].coords) < self.atoms[j].radius + Atom.vdw_radius.get("water"):
                             is_covered_table[k] = True
                             continue
-            self.atoms[i].inaccessible_points = np.count_nonzero(is_covered_table)
+
             for j in range(len(sphere_points)):
                 if is_covered_table[j]:
                     self.atoms[i].inaccessible_points_list.append(sphere_points[j])
                 else:
                     self.atoms[i].accessible_points_list.append(sphere_points[j])
-            self.inaccessible_points += np.count_nonzero(is_covered_table)
 
-        return self.inaccessible_points
-    
+            accessible_points_count += len(self.atoms[i].accessible_points_list)
+            inaccessible_points_count += len(self.atoms[i].inaccessible_points_list)
+
+        return accessible_points_count, inaccessible_points_count
+
     def get_accessible_surface(self, n_points = None):
         if n_points is None:
             n_points = self.n_points
-            
-        self.accessible_surface = 0
 
         for atom in self.atoms:
-            self.accessible_surface += (((n_points - atom.inaccessible_points) * 4 * np.pi * ((atom.radius + Atom.vdw_radius.get("water")) ** 2)) / n_points)
-        return self.accessible_surface
+            if (atom.accessible_points_list is None) or (atom.inaccessible_points_list is None):
+                self.compute_accessible_points(n_points)
+                break
+        
+        accessible_surface = 0
+
+        for atom in self.atoms:
+            accessible_surface += atom.get_accessible_surface(n_points)
+        return accessible_surface
 
     def get_max_surface(self):
         max_surface = 0

@@ -15,9 +15,8 @@ class Atom:
         self.coords = coords
         self.aromatic = resname in ["HIS", "TRP", "TYR", "PHE"]
         self.radius = self.get_radius()
-        self.inaccessible_points = 0
-        self.accessible_points_list = []
-        self.inaccessible_points_list = []
+        self.accessible_points_list = None
+        self.inaccessible_points_list = None
 
     def __str__(self):
         return f"{self.radius} / {self.atom_name} / {self.atom_num} / {self.resname} / {self.resnum} / coords({self.coords[0]}, {self.coords[1]}, {self.coords[2]})"
@@ -65,6 +64,9 @@ class Atom:
                         np.sin(theta) * np.sin(phi) * radius + self.coords[1], 
                         np.cos(theta) * radius + self.coords[2]])
         return np.array(points)
+
+    def get_accessible_surface(self, n_points):
+        return ((len(self.accessible_points_list) * 4 * np.pi * ((self.radius + Atom.vdw_radius.get("water")) ** 2)) / n_points)
 
 def eucl_dist(coords1, coords2):
     return np.sqrt((coords1[0] - coords2[0]) ** 2 + (coords1[1] - coords2[1]) ** 2 + (coords1[2] - coords2[2]) ** 2)
