@@ -22,7 +22,7 @@ class Atom:
 
     def get_radius(self) -> float:
         """
-        Returns the van der Waals radius of the atom based on its name and residue type.
+        Returns the van der Waals radius of the atom based on its name and residue type, according to Shrake article.
         
         Returns:
             float: The van der Waals radius of the atom.
@@ -49,13 +49,14 @@ class Atom:
 
     def get_points(self, n_points : Optional[int] = 92) -> np.ndarray:
         """
-        Generates points on the surface of a sphere centered at the atom's coordinates.
+        Generates points on the surface of a sphere centered at the atom's coordinates according to Saff and Kuijlaars algorithm.
         
         Args:
             n_points (int): The number of points to generate.
             
         Returns:
-            numpy.ndarray: An array of 3D points on the surface of the sphere."""
+            numpy.ndarray: An array of 3D points on the surface of the sphere.
+        """
         radius = self.radius + Atom.vdw_radius.get("water")
 
         thetas = []
@@ -88,6 +89,16 @@ class Atom:
         Returns:
             float: The accessible surface area of the atom.
         """
+        # If n_points is not provided, it defaults to the sum of accessible and inaccessible points.
         if n_points is None:
-            n_points = len(self.accessible_points_list)
+            n_points = len(self.accessible_points_list) + len(self.inaccessible_points_list)
         return ((len(self.accessible_points_list) * 4 * np.pi * ((self.radius + Atom.vdw_radius.get("water")) ** 2)) / n_points)
+
+    def get_max_surface(self) -> float:
+        """
+        Calculates the maximum surface area of the atom based on its radius and the van der Waals radius of water.
+        
+        Returns:
+            float: The maximum surface area of the atom.
+        """
+        return 4 * np.pi * ((self.radius + Atom.vdw_radius.get("water")) ** 2)

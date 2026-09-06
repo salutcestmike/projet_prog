@@ -61,7 +61,7 @@ if __name__ == "__main__":
     for file in files_to_process:
         molecule = Molecule.from_pdb_file(file, n_points)   
 
-        accessible_points_count, inaccessible_points_count = molecule.compute_accessible_points(n_points)
+        accessible_points_count, inaccessible_points_count = molecule.compute_accessible_points()
 
         print(f"Molecule: {molecule.name}")
         print(f"Number of residues: {len(molecule.residues)}")
@@ -70,22 +70,25 @@ if __name__ == "__main__":
         print(f"Number of inaccessible points: {inaccessible_points_count}")
 
         chains = list(set([residue.chain for residue in molecule.residues]))
-        chains.sort()
-        for chain in chains:
-            accessible_surface = molecule.get_accessible_surface(n_points, chain)
-            max_accessible_surface = molecule.get_max_surface(chain)
-            print(f"Chain {chain} accessible surface: {round(accessible_surface, 2)} Å^2")
-            print(f"Chain {chain} accessible percentage: {round(100 * accessible_surface / max_accessible_surface, 2)} %")
+        if len(chains) > 1:
+            chains.sort()
+            for chain in chains:
+                accessible_surface = molecule.get_accessible_surface(chain)
+                max_accessible_surface = molecule.get_max_surface(chain)
+                print(f"Chain {chain} accessible surface: {round(accessible_surface, 2)} Å^2")
+                print(f"Chain {chain} accessible percentage: {round(100 * accessible_surface / max_accessible_surface, 2)} %")
 
         print(f"Total accessible surface: {round(molecule.get_accessible_surface(), 2)} Å^2")
         print(f"Total accessible percentage: {round(100 * accessible_points_count / (len(molecule.atoms) * n_points), 2)} %")
         print()
-        
+
+        # Export results
         with open(f"{output_folder}/{file.stem}.txt", 'w') as f:
             for residue in molecule.residues:
                 for atom in residue.atoms:
                     f.write(f"{atom.atom_num} / {atom.atom_name} / {100 * len(atom.accessible_points_list) / n_points} %\n")
 
+        # Display only the first molecule if display is True
         if display:
             display = False
 

@@ -60,6 +60,7 @@ class Molecule:
         atoms_lines = []
         with open(filename, "r") as f:
             for line in f:
+                # Only atoms that are not hydrogen
                 if line.startswith(("ATOM")) and (line[77].strip() != "H"):
                     atoms_lines.append(line.strip())
 
@@ -68,10 +69,12 @@ class Molecule:
         resname = None
         chain = None
         for atom in atoms_lines:
+            # If not the same residue, create a new residue with the previous atoms and add a new empty list for the next residue's atoms
             if int(atom[22:26]) != resnum:
                 residues[len(residues) - 1] = Residu(resnum, resname, atom[21], residues[len(residues) - 1])
                 residues.append([])
                 resnum += 1
+            # If not the same chain, reset the residue number
             if chain is not None and chain != atom[21]:
                 resnum = 1
             resname = atom[17:20].strip()
@@ -80,6 +83,7 @@ class Molecule:
                                                 atom[12:16].strip(), 
                                                 resname,
                                                 [float(atom[30:38]), float(atom[39:46]), float(atom[47:54])]))
+        # Add the last residue to the list of residues
         residues[len(residues) - 1] = Residu(resnum, resname, atom[21], residues[len(residues) - 1])
 
         return cls(filename.stem, n_points, residues)
@@ -95,35 +99,37 @@ class Molecule:
         Generates a neighbor table for the atoms in the molecule. The neighbor table is a boolean matrix where each entry (i, j) indicates whether atom i and atom j are neighbors based on their coordinates and radii.
         
         Returns:
-            numpy.ndarray: A boolean matrix representing the neighbor relationships between atoms in the molecule."""
+            numpy.ndarray: A boolean matrix representing the neighbor relationships between atoms in the molecule.
+        """
         coords = np.asarray([atom.coords for atom in self.atoms], dtype=np.float64)
         radii = np.asarray([atom.radius for atom in self.atoms], dtype=np.float64)
         return generate_neighbor_table_numba(coords, radii, Atom.vdw_radius["water"])
 
-    def compute_accessible_points(self, n_points: Optional[int] = None) -> Tuple[int, int]:
+    def compute_accessible_points(self) -> Tuple[int, int]:
         """
         Computes the number of accessible and inaccessible points for each atom in the molecule based on their coordinates, radii, and the number of points generated on their surfaces.
         
         Returns:
             Tuple[int, int]: A tuple containing the count of accessible and inaccessible points.
         """
-        if n_points is None:
-            n_points = self.n_points
-
         accessible_points_count = 0
         inaccessible_points_count = 0
 
         for i in tqdm(range(len(self.atoms))):
             self.atoms[i].accessible_points_list = []
             self.atoms[i].inaccessible_points_list = []
-            is_covered_table = np.zeros(n_points).astype(bool)
-            sphere_points = np.array(self.atoms[i].get_points(n_points))
 
+            # Create a boolean array to track which points on the atom's surface are covered by neighboring atoms
+            is_covered_table = np.zeros(self.n_points).astype(bool)
+            sphere_points = np.array(self.atoms[i].get_points(self.n_points))
+
+            # Check each neighboring atom to see if it covers any points on the current atom's surface
             for j in range(len(self.atoms)):
                 if (self.neighbor_table[i][j]):
                     distances = np.linalg.norm(sphere_points - np.array(self.atoms[j].coords), axis=1)
                     is_covered_table = is_covered_table | (distances < self.atoms[j].radius + Atom.vdw_radius["water"])
 
+            # Separate the points into accessible and inaccessible lists based on the coverage information
             for j in range(len(sphere_points)):
                 if is_covered_table[j]:
                     self.atoms[i].inaccessible_points_list.append(sphere_points[j])
@@ -135,26 +141,23 @@ class Molecule:
 
         return accessible_points_count, inaccessible_points_count
 
-    def get_accessible_surface(self, n_points : Optional[int] = None, chain : Optional[str] = None) -> float:
+    def get_accessible_surface(self, chain : Optional[str] = None) -> float:
         """
         Computes the accessible surface area of the molecule by summing the accessible surface areas of its residues.
 
         Args:
-            n_points (int): The total number of points generated on each atom's surface.
-            chain (str): The chain to which the residues belong.
+            chain (Optional[str]): The chain to which the residues belong.
         
         Returns:
             float: The accessible surface area of the molecule.
         """
-        if n_points is None:
-            n_points = self.n_points
-
+        # Ensure that the accessible and inaccessible points for each atom are computed
         for atom in self.atoms:
             if (atom.accessible_points_list is None) or (atom.inaccessible_points_list is None):
-                self.compute_accessible_points(n_points)
+                self.compute_accessible_points()
                 break
         
-        return sum([residue.get_accessible_surface(n_points, chain) for residue in self.residues])
+        return sum([residue.get_accessible_surface(self.n_points, chain) for residue in self.residues])
 
     def get_max_surface(self, chain : Optional[str] = None) -> float:
         """

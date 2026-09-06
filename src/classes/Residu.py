@@ -20,10 +20,11 @@ class Residu:
         Args:
             n_points (int): The total number of points generated on each atom's surface.
             chain (str): The chain to which the residue belongs.
-            
+
         Returns:
             float: The accessible surface area of the residue.
         """
+        # If a specific chain is provided and it does not match the residue's chain
         if chain is not None and self.chain != chain:
             return 0
         return np.sum([atom.get_accessible_surface(n_points) for atom in self.atoms])
@@ -38,6 +39,7 @@ class Residu:
         Returns:
             float: The maximum surface area of the residue.
         """
+        # If a specific chain is provided and it does not match the residue's chain
         if chain is not None and self.chain != chain:
             return 0
-        return np.sum([4 * np.pi * ((atom.radius + Atom.vdw_radius.get("water")) ** 2) for atom in self.atoms])
+        return np.sum([atom.get_max_surface() for atom in self.atoms])
