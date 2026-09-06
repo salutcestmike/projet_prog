@@ -44,25 +44,20 @@ class Residu:
             return 0
         return np.sum([atom.get_max_surface() for atom in self.atoms])
 
-    def get_surface_results(self, n_points : Optional[int] = None) -> List[dict]:
+    def get_surface_results(self, n_points : Optional[int] = None) -> dict:
         """
-        Generates a list of dictionaries containing the surface results for each atom in the residue.
+        Generates a dictionary containing the surface results for the residue, including its number, name, chain, and the surface results of its atoms.
         
         Args:
             n_points (Optional[int]): The total number of points generated on each atom's surface.
             
         Returns:
-            List[dict]: A list of dictionaries containing the atom number, atom name, and surfaces for each atom the residue.
+            dict: A dictionary containing the residue number, residue name, chain, and a list of
+            surface results for each atom in the residue.
         """
-        results = []
-        for atom in self.atoms:
-            accessible_surface = atom.get_accessible_surface(n_points)
-            max_surface = atom.get_max_surface()
-            results.append({
-                "atom_num": atom.atom_num,
-                "atom_name": atom.atom_name,
-                "accessible_surface": accessible_surface,
-                "max_surface": max_surface,
-                "accessible_percentage": (accessible_surface / max_surface) * 100,
-            })
-        return results
+        return {
+            "resnum": self.resnum,
+            "resname": self.resname,
+            "chain": self.chain,
+            "atoms": [atom.get_surface_results(n_points) for atom in self.atoms]
+        }

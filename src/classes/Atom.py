@@ -102,3 +102,22 @@ class Atom:
             float: The maximum surface area of the atom.
         """
         return 4 * np.pi * ((self.radius + Atom.vdw_radius.get("water")) ** 2)
+
+    def get_surface_results(self, n_points : Optional[int] = None) -> dict:
+        """
+        Generates a dictionary containing the surface results for the atom.
+        
+        Args:
+            n_points (Optional[int]): The total number of points generated on the atom's surface.
+        
+        Returns:
+            dict: A dictionary containing the atom number, atom name, accessible surface area, maximum surface
+            area, and accessible percentage of the atom.
+        """ 
+        return {
+                "atom_num": self.atom_num,
+                "atom_name": self.atom_name,
+                "accessible_surface": self.get_accessible_surface(n_points),
+                "max_surface": self.get_max_surface(),
+                "accessible_percentage": (self.get_accessible_surface(n_points) / self.get_max_surface()) * 100,
+            }
