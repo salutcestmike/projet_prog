@@ -1,13 +1,13 @@
 import numpy as np
 import json
-
+from typing import Tuple, Optional
 
 class Atom:
 
     with open('config/vdw_radius.json') as f:
         vdw_radius = json.load(f)
 
-    def __init__(self, atom_num, atom_name, resname, coords):
+    def __init__(self, atom_num : int, atom_name : str, resname : str, coords : Optional[Tuple[float, float, float]] = None):
         self.atom_num = atom_num
         self.atom_name = atom_name
         self.coords = coords
@@ -17,10 +17,16 @@ class Atom:
         self.accessible_points_list = None
         self.inaccessible_points_list = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.radius} / {self.atom_name} / {self.atom_num} / {self.resname} / {self.resnum} / coords({self.coords[0]}, {self.coords[1]}, {self.coords[2]})"
 
-    def get_radius(self):
+    def get_radius(self) -> float:
+        """
+        Returns the van der Waals radius of the atom based on its name and residue type.
+        
+        Returns:
+            float: The van der Waals radius of the atom.
+        """
         if self.atom_name[0] == "N":
             return Atom.vdw_radius.get("nitrogen")
         elif self.atom_name[0] == "S":
@@ -41,7 +47,15 @@ class Atom:
                     return Atom.vdw_radius.get("non-aromatic carbon")
         return None
 
-    def get_points(self, n_points = 92):
+    def get_points(self, n_points : Optional[int] = 92) -> np.ndarray:
+        """
+        Generates points on the surface of a sphere centered at the atom's coordinates.
+        
+        Args:
+            n_points (int): The number of points to generate.
+            
+        Returns:
+            numpy.ndarray: An array of 3D points on the surface of the sphere."""
         radius = self.radius + Atom.vdw_radius.get("water")
 
         thetas = []
@@ -64,5 +78,16 @@ class Atom:
                         np.cos(theta) * radius + self.coords[2]])
         return np.array(points)
 
-    def get_accessible_surface(self, n_points):
+    def get_accessible_surface(self, n_points : Optional[int] = None) -> float:
+        """
+        Calculates the accessible surface area of the atom based on the number of accessible points.
+        
+        Args:
+            n_points (int): The total number of points generated on the atom's surface.
+            
+        Returns:
+            float: The accessible surface area of the atom.
+        """
+        if n_points is None:
+            n_points = len(self.accessible_points_list)
         return ((len(self.accessible_points_list) * 4 * np.pi * ((self.radius + Atom.vdw_radius.get("water")) ** 2)) / n_points)
