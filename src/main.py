@@ -79,7 +79,8 @@ if __name__ == "__main__":
 
         print(f"Total accessible surface: {round(molecule.get_accessible_surface(), 2)} Å^2")
         print(f"Total accessible percentage: {round(100 * accessible_points_count / (len(molecule.atoms) * n_points), 2)} %")
-
+        print()
+        
         with open(f"{output_folder}/{file.stem}.txt", 'w') as f:
             for residue in molecule.residues:
                 for atom in residue.atoms:

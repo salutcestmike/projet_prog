@@ -7,7 +7,18 @@ from pathlib import Path
 
 
 @njit
-def generate_neighbor_table_numba(coords, radii, water_radius):
+def generate_neighbor_table_numba(coords: np.ndarray, radii: np.ndarray, water_radius: float) -> np.ndarray:
+    """
+    Generates a neighbor table for the atoms in the molecule. The neighbor table is a boolean matrix where each entry (i, j) indicates whether atom i and atom j are neighbors based on their coordinates and radii.
+
+    Args:
+        coords (np.ndarray): An array of shape (n, 3) containing the coordinates of the atoms.
+        radii (np.ndarray): An array of shape (n,) containing the radii of the atoms.
+        water_radius (float): The van der Waals radius of water molecules.
+
+    Returns:
+        np.ndarray: A boolean matrix representing the neighbor relationships between atoms in the molecule.
+    """
     n = len(coords)
     table = np.zeros((n, n), dtype=np.bool)
 
@@ -23,6 +34,7 @@ def generate_neighbor_table_numba(coords, radii, water_radius):
             table[j][i] = table[i][j]
 
     return table
+
 
 class Molecule:
 
@@ -69,6 +81,7 @@ class Molecule:
                                                 resname,
                                                 [float(atom[30:38]), float(atom[39:46]), float(atom[47:54])]))
         residues[len(residues) - 1] = Residu(resnum, resname, atom[21], residues[len(residues) - 1])
+
         return cls(filename.stem, n_points, residues)
 
     def __str__(self) -> str:
