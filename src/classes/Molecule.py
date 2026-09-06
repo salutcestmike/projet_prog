@@ -41,7 +41,6 @@ class Molecule:
         Args:
             filename (Union[str, Path]): The path to the PDB file.
             n_points (int): The number of points to generate on each atom's surface.
-            residues (Optional[List[Residu]]): A list of residue instances.
 
         Returns:
             'Molecule': An instance of the Molecule class.
