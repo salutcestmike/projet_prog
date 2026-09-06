@@ -38,7 +38,7 @@ def generate_neighbor_table_numba(coords: np.ndarray, radii: np.ndarray, water_r
 
 class Molecule:
 
-    def __init__(self, name : str, n_points : int, residues : Optional[List[Residu]] = None):
+    def __init__(self, name : str, n_points : int, residues : List[Residu]):
         self.name = name
         self.n_points = n_points
         self.residues = residues
@@ -65,18 +65,20 @@ class Molecule:
                     atoms_lines.append(line.strip())
 
         residues = [[]]
-        resnum = 1
+        resnum = None
         resname = None
         chain = None
         for atom in atoms_lines:
+            # Initialize resnum, resname, and chain if they are None or if the chain has changed
+            if resnum is None or resname is None or chain is None or chain != atom[21]:
+                resnum = int(atom[22:26])
+                resname = atom[17:20].strip()
+                chain = atom[21]
             # If not the same residue, create a new residue with the previous atoms and add a new empty list for the next residue's atoms
             if int(atom[22:26]) != resnum:
-                residues[len(residues) - 1] = Residu(resnum, resname, atom[21], residues[len(residues) - 1])
+                residues[len(residues) - 1] = Residu(resnum, resname, residues[len(residues) - 1], chain)
                 residues.append([])
                 resnum += 1
-            # If not the same chain, reset the residue number
-            if chain is not None and chain != atom[21]:
-                resnum = 1
             resname = atom[17:20].strip()
             chain = atom[21]
             residues[len(residues) - 1].append(Atom(int(atom[6:11]),
@@ -84,7 +86,7 @@ class Molecule:
                                                 resname,
                                                 [float(atom[30:38]), float(atom[39:46]), float(atom[47:54])]))
         # Add the last residue to the list of residues
-        residues[len(residues) - 1] = Residu(resnum, resname, atom[21], residues[len(residues) - 1])
+        residues[len(residues) - 1] = Residu(resnum, resname, residues[len(residues) - 1], chain)
 
         return cls(filename.stem, n_points, residues)
 
@@ -164,7 +166,7 @@ class Molecule:
         Computes the maximum surface area of the molecule by summing the maximum surface areas of its residues.
             
         Args:
-            chain (str): The chain to which the residues belong.
+            chain (Optional[str]): The chain to which the residues belong.
         
         Returns:
             float: The maximum surface area of the molecule.

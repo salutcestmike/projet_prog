@@ -7,7 +7,7 @@ class Atom:
     with open('config/vdw_radius.json') as f:
         vdw_radius = json.load(f)
 
-    def __init__(self, atom_num : int, atom_name : str, resname : str, coords : Optional[Tuple[float, float, float]] = None):
+    def __init__(self, atom_num : int, atom_name : str, resname : str, coords : Tuple[float, float, float]):
         self.atom_num = atom_num
         self.atom_name = atom_name
         self.coords = coords
@@ -52,7 +52,7 @@ class Atom:
         Generates points on the surface of a sphere centered at the atom's coordinates according to Saff and Kuijlaars algorithm.
         
         Args:
-            n_points (int): The number of points to generate.
+            n_points (Optional[int]): The number of points to generate.
             
         Returns:
             numpy.ndarray: An array of 3D points on the surface of the sphere.
@@ -84,7 +84,7 @@ class Atom:
         Calculates the accessible surface area of the atom based on the number of accessible points.
         
         Args:
-            n_points (int): The total number of points generated on the atom's surface.
+            n_points (Optional[int]): The total number of points generated on the atom's surface.
             
         Returns:
             float: The accessible surface area of the atom.
