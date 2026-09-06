@@ -34,7 +34,7 @@ class Molecule:
         self.neighbor_table = self.generate_neighbor_table()
 
     @classmethod
-    def from_pdb_file(cls, filename : Union[str, Path], n_points : int, residues : Optional[List[Residu]] = None) -> 'Molecule':
+    def from_pdb_file(cls, filename : Union[str, Path], n_points : int) -> 'Molecule':
         """
         Creates a Molecule instance from a PDB file by parsing the file to extract atom and residue information.
         
