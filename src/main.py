@@ -84,11 +84,7 @@ if __name__ == "__main__":
 
         # Export results
         molecule.export_surface_results(output_folder)
-        # with open(f"{output_folder}/{file.stem}.txt", 'w') as f:
-        #     for residue in molecule.residues:
-        #         for atom in residue.atoms:
-        #             f.write(f"{atom.atom_num} / {atom.atom_name} / {100 * len(atom.accessible_points_list) / n_points} %\n")
-
+        
         # Display only the first molecule if display is True
         if display:
             display = False
