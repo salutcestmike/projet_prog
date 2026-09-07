@@ -202,16 +202,20 @@ class Molecule:
                 residue_surface = sum([atom['accessible_surface'] for atom in residue['atoms']])
                 residue_surface_percentage = 100 * residue_surface / sum([atom['max_surface'] for atom in residue['atoms']])
                 f.write(f"RES {residue['resname']} {residue['chain']} {residue['resnum']:3d} {residue_surface:8.2f} {residue_surface_percentage:5.1f}\n")
+            f.write(f"END  Absolute sums over single chains surface\n")
+
             chains = list(set([residue['chain'] for residue in results]))
             chains.sort()
-            if len(chains) > 1:
-                for chain in chains:
-                    chain_surface = sum([sum([atom['accessible_surface'] for atom in residue['atoms']]) for residue in results if residue['chain'] == chain])
-                    f.write(f"Chain {chain} accessible surface: {chain_surface:.2f}\n")
-            f.write(f"Total accessible surface: {sum([sum([atom['accessible_surface'] for atom in residue['atoms']]) for residue in results]):.2f}\n")
+            i = 1
+            for chain in chains:
+                chain_surface = sum([sum([atom['accessible_surface'] for atom in residue['atoms']]) for residue in results if residue['chain'] == chain])
+                f.write(f"CHAIN {i:2d} {chain} {chain_surface:10.1f}\n")
+                i += 1
+            f.write("END  Absolute sums over all chains\n")
+            f.write(f"TOTAL {sum([sum([atom['accessible_surface'] for atom in residue['atoms']]) for residue in results]):15.1f}")
 
         # ASA file output
         with open(output_folder / f"{self.name}_asa.txt", 'w') as f:
             for residue in results:
                 for atom in residue['atoms']:
-                    f.write(f"ATOM {atom['atom_num']:5d} {atom['atom_name']:4s} {residue['resname']} {residue['resnum']:5d} {residue['chain']} {atom['accessible_surface']:8.2f} {100 * atom['accessible_surface'] / atom['max_surface']:8.2f}\n")
+                    f.write(f"ATOM {atom['atom_num']:6d}  {atom['atom_name']:3s} {residue['resname']} {residue['chain']} {residue['resnum']:3d} {" "*27} {100 * atom['accessible_surface'] / atom['max_surface']:7.3f}\n")
