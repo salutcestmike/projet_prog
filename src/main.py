@@ -18,7 +18,6 @@ def getArgs() -> Dict[str, Any]:
     parser.add_argument("-i", "--pdb_folder_or_file", required=True, type=str)
     parser.add_argument("-o", "--output_folder", required=True, type=str)
     parser.add_argument("-n", "--n_sphere_points", required=True, type=int)
-    parser.add_argument("-d", "--display_molecule", action="store_true")
 
     args = parser.parse_args()
 
@@ -34,7 +33,6 @@ def getArgs() -> Dict[str, Any]:
         "input": input,
         "output_folder": output_folder,
         "n_sphere_points": int(args.n_sphere_points),
-        "display_molecule": args.display_molecule if input.is_file() else False
     }
 
 
@@ -55,7 +53,6 @@ if __name__ == "__main__":
     [print(f"{file}") for file in files_to_process]
     print()
 
-    display = args.get("display_molecule", False)
     n_points = args.get("n_sphere_points", 92)
 
     for file in files_to_process:
@@ -85,19 +82,3 @@ if __name__ == "__main__":
         # Export results
         molecule.export_surface_results(output_folder)
         
-        # Display only the first molecule if display is True
-        if display:
-            display = False
-
-            accessible_points = []
-            for atom in molecule.atoms:
-                accessible_points.extend(atom.accessible_points_list)
-            
-            pts = Points(accessible_points, r=10, c="red")
-            spheres = [Sphere(pos=atom.coords, r=atom.radius + Atom.vdw_radius.get("water"))
-                       .alpha(0.15)
-                       .c("grey") for atom in molecule.atoms]
-            
-            axes = Axes(xtitle = "X", ytitle = "Y", ztitle = "Z")
-            plotter = Plotter(axes = axes, bg = "white")
-            plotter.show(spheres, pts, axes = 1, viewup = "z", interactive = True)
