@@ -35,6 +35,35 @@ def generate_neighbor_table_numba(coords: np.ndarray, radii: np.ndarray, water_r
 
     return table
 
+@njit
+def _generate_neighbor_table_numba(coords: np.ndarray, radii: np.ndarray, water_radius: float) -> np.ndarray:
+    """
+    Generates a neighbor table for the atoms in the molecule. The neighbor table is a boolean matrix where each entry (i, j) indicates whether atom i and atom j are neighbors based on their coordinates and radii.
+
+    Args:
+        coords (np.ndarray): An array of shape (n, 3) containing the coordinates of the atoms.
+        radii (np.ndarray): An array of shape (n,) containing the radii of the atoms.
+        water_radius (float): The van der Waals radius of water molecules.
+
+    Returns:
+        np.ndarray: A boolean matrix representing the neighbor relationships between atoms in the molecule.
+    """
+    n = len(coords)
+    table = np.zeros((n, n), dtype=np.bool)
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            dx = coords[i][0] - coords[j][0]
+            dy = coords[i][1] - coords[j][1]
+            dz = coords[i][2] - coords[j][2]
+            distance = dx*dx + dy*dy + dz*dz
+            threshold = 2 * water_radius + radii[i] + radii[j]
+
+            table[i][j] = distance < threshold * threshold
+            table[j][i] = table[i][j]
+
+    return table
+
 
 class Molecule:
 
@@ -44,6 +73,7 @@ class Molecule:
         self.residues = residues
         self.atoms = [atom for residue in self.residues for atom in residue.atoms]
         self.neighbor_table = self.generate_neighbor_table()
+        self.neighbors = None
 
     @classmethod
     def from_pdb_file(cls, filename : Union[str, Path], n_points : int) -> 'Molecule':
@@ -101,7 +131,7 @@ class Molecule:
             chaine += str(residue) + "\n"
         return chaine
 
-    def generate_neighbor_table(self) -> np.ndarray:
+    def _generate_neighbor_table(self) -> np.ndarray:
         """
         Generates a neighbor table for the atoms in the molecule. The neighbor table is a boolean matrix where each entry (i, j) indicates whether atom i and atom j are neighbors based on their coordinates and radii.
         
@@ -110,7 +140,24 @@ class Molecule:
         """
         coords = np.asarray([atom.coords for atom in self.atoms], dtype=np.float64)
         radii = np.asarray([atom.radius for atom in self.atoms], dtype=np.float64)
-        return generate_neighbor_table_numba(coords, radii, Atom.vdw_radius["water"])
+        self.neighbor_table = generate_neighbor_table_numba(coords, radii, Atom.vdw_radius["water"])
+        self.neighbors = [
+            np.nonzero(self.neighbor_table[i])
+            for i in range(len(self.atoms))
+        ]
+        return self.neighbor_table
+
+    def generate_neighbor_table(self):
+        coords = np.asarray([atom.coords for atom in self.atoms], dtype=np.float64)
+        radii = np.asarray([atom.radius for atom in self.atoms], dtype=np.float64)
+        table = generate_neighbor_table_numba(coords, radii, Atom.vdw_radius["water"])
+
+        neighbors = [
+            np.where(table[i])[0]
+            for i in range(len(table))
+        ]
+
+        return neighbors
 
     def compute_accessible_points(self) -> Tuple[int, int]:
         """
@@ -130,11 +177,20 @@ class Molecule:
             is_covered_table = np.zeros(self.n_points).astype(bool)
             sphere_points = np.array(self.atoms[i].get_points(self.n_points))
 
-            # Check each neighboring atom to see if it covers any points on the current atom's surface
-            for j in range(len(self.atoms)):
-                if (self.neighbor_table[i][j]):
-                    distances = np.linalg.norm(sphere_points - np.array(self.atoms[j].coords), axis=1)
-                    is_covered_table = is_covered_table | (distances < self.atoms[j].radius + Atom.vdw_radius["water"])
+            # # Check each neighboring atom to see if it covers any points on the current atom's surface
+            # for j in range(len(self.atoms)):
+            #     if (self.neighbor_table[i][j]):
+            #         distances = np.linalg.norm(sphere_points - np.array(self.atoms[j].coords), axis=1)
+            #         is_covered_table = is_covered_table | (distances < self.atoms[j].radius + Atom.vdw_radius["water"])
+            #         if np.all(is_covered_table):
+            #             break
+            
+            for j in self.neighbor_table[i]:
+                distances = np.linalg.norm(sphere_points - np.array(self.atoms[j].coords), axis=1)
+                is_covered_table = is_covered_table | (distances < self.atoms[j].radius + Atom.vdw_radius["water"])
+                if np.all(is_covered_table):
+                    break
+            
 
             # Separate the points into accessible and inaccessible lists based on the coverage information
             for j in range(len(sphere_points)):

@@ -16,6 +16,7 @@ class Atom:
         self.radius = self.get_radius()
         self.accessible_points_list = None
         self.inaccessible_points_list = None
+        
 
     def __str__(self) -> str:
         return f"{self.radius} / {self.atom_name} / {self.atom_num} / {self.resname} / {self.resnum} / coords({self.coords[0]}, {self.coords[1]}, {self.coords[2]})"
