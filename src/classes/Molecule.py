@@ -69,12 +69,17 @@ class Molecule:
         resname = None
         chain = None
         for atom in atoms_lines:
-            # Initialize resnum, resname, and chain if they are None or if the chain has changed
-            if resnum is None or resname is None or chain is None or chain != atom[21]:
+            # Initialize resnum, resname, and chain if they are None 
+            if resnum is None or resname is None or chain is None:
                 resnum = int(atom[22:26])
                 resname = atom[17:20].strip()
                 chain = atom[21]
-            # If not the same residue, create a new residue with the previous atoms and add a new empty list for the next residue's atoms
+            # If the chain has changed, create a new residue with the previous atoms and add a new empty list for the next chain residue's atoms
+            if chain != atom[21]:
+                residues[len(residues) - 1] = Residu(resnum, resname, residues[len(residues) - 1], chain)
+                residues.append([])
+                resnum = int(atom[22:26])
+            # If the residue has changed, create a new residue with the previous atoms and add a new empty list for the next residue's atoms
             if int(atom[22:26]) != resnum:
                 residues[len(residues) - 1] = Residu(resnum, resname, residues[len(residues) - 1], chain)
                 residues.append([])
@@ -196,7 +201,7 @@ class Molecule:
             for residue in results:
                 residue_surface = sum([atom['accessible_surface'] for atom in residue['atoms']])
                 residue_surface_percentage = 100 * residue_surface / sum([atom['max_surface'] for atom in residue['atoms']])
-                f.write(f"RES {residue['resname']} {residue['resnum']:5d} {residue['chain']} {residue_surface:8.2f} {residue_surface_percentage:8.2f}\n")
+                f.write(f"RES {residue['resname']} {residue['chain']} {residue['resnum']:3d} {residue_surface:8.2f} {residue_surface_percentage:5.1f}\n")
             chains = list(set([residue['chain'] for residue in results]))
             chains.sort()
             if len(chains) > 1:
