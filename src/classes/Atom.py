@@ -30,6 +30,8 @@ class Atom:
         """
         if self.atom_name[0] == "N":
             return Atom.vdw_radius.get("nitrogen")
+        elif self.atom_name[0] == "P":
+            return Atom.vdw_radius.get("phosphorus")
         elif self.atom_name[0] == "S":
             return Atom.vdw_radius.get("sulfur")
         elif self.atom_name[0] == "O":
