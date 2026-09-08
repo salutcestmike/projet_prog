@@ -214,8 +214,10 @@ class Molecule:
         """
         results = self.get_surface_results()
 
+        (output_folder / self.name).mkdir(exist_ok=True)
+        
         # RSA file output
-        with open(output_folder / f"{self.name}_rsa.txt", 'w') as f:
+        with open(output_folder / self.name / f"{self.name}_rsa.txt", 'w') as f:
             for residue in results:
                 residue_surface = sum([atom['accessible_surface'] for atom in residue['atoms']])
                 residue_surface_percentage = 100 * residue_surface / sum([atom['max_surface'] for atom in residue['atoms']])
@@ -233,7 +235,7 @@ class Molecule:
             f.write(f"TOTAL {sum([sum([atom['accessible_surface'] for atom in residue['atoms']]) for residue in results]):15.1f}")
 
         # ASA file output
-        with open(output_folder / f"{self.name}_asa.txt", 'w') as f:
+        with open(output_folder / self.name / f"{self.name}_asa.txt", 'w') as f:
             for residue in results:
                 for atom in residue['atoms']:
                     f.write(f"ATOM {atom['atom_num']:6d}  {atom['atom_name']:3s} {residue['resname']} {residue['chain']} {residue['resnum']:3d} {" "*27} {100 * atom['accessible_surface'] / atom['max_surface']:7.3f}\n")

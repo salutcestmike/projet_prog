@@ -4,6 +4,8 @@ from vedo import Points, Sphere, Plotter, Axes
 import argparse
 from datetime import datetime
 from typing import Dict, Any
+from tqdm import tqdm
+
 
 
 def getArgs() -> Dict[str, Any]:
@@ -55,7 +57,7 @@ if __name__ == "__main__":
 
     n_points = args.get("n_sphere_points", 92)
 
-    for file in files_to_process:
+    for file in tqdm(files_to_process, desc="Files analyzed"):
         molecule = Molecule.from_pdb_file(file, n_points)   
 
         accessible_points_count, inaccessible_points_count = molecule.compute_accessible_points()
