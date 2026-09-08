@@ -19,7 +19,7 @@ class Atom:
         
 
     def __str__(self) -> str:
-        return f"{self.radius} / {self.atom_name} / {self.atom_num} / {self.resname} / {self.resnum} / coords({self.coords[0]}, {self.coords[1]}, {self.coords[2]})"
+        return f"{self.radius} / {self.atom_name} / {self.atom_num} / {self.resname} / coords({self.coords[0]}, {self.coords[1]}, {self.coords[2]})"
 
     def get_radius(self) -> float:
         """
@@ -46,7 +46,8 @@ class Atom:
                     return Atom.vdw_radius.get("aromatic carbon")
                 else:
                     return Atom.vdw_radius.get("non-aromatic carbon")
-        return None
+        print(f"Warning | Undefined atom radius : {self.atom_name} / {self.atom_num} / {self.resname} / coords({self.coords[0]}, {self.coords[1]}, {self.coords[2]})")
+        return 0
 
     def get_points(self, n_points : Optional[int] = 92) -> np.ndarray:
         """

@@ -111,7 +111,7 @@ class Molecule:
                     directions.append([dx, dy, dz])
 
         # Generate neighbors atom list using the spatial grid
-        for i in tqdm(range(n), desc="Generating neighbors list"):
+        for i in tqdm(range(n), desc=f"{self.name} | Generating neighbors list"):
             cell = np.floor(coords[i] / cell_size).astype(int) # Determine the cell of the current atom
             # Check neighboring cells for potential neighbors
             for dx, dy, dz in directions:
@@ -139,7 +139,7 @@ class Molecule:
         accessible_points_count = 0
         inaccessible_points_count = 0
 
-        for i in tqdm(range(len(self.atoms)), desc="Computing accessible points"):
+        for i in tqdm(range(len(self.atoms)), desc=f"{self.name} | Computing accessible points"):
             self.atoms[i].accessible_points_list = []
             self.atoms[i].inaccessible_points_list = []
 
