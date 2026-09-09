@@ -1,6 +1,4 @@
 from pathlib import Path
-
-import numpy
 from classes.Molecule import Molecule, Residu, Atom
 from vedo import Points, Sphere, Plotter, Axes
 import argparse
