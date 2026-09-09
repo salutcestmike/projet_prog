@@ -37,25 +37,22 @@ if __name__ == "__main__":
     n_points = args.get("n_sphere_points", 92)
 
     molecule = Molecule.from_pdb_file(file, n_points)   
-    if len(molecule.atoms) * n_points > 25000:
-        print(f"Warning: The molecule has {len(molecule.atoms) * n_points} sphere points to display. Please use a smaller molecule or reduce the number of sphere points.")
-    else:
-        molecule.compute_accessible_points()
+    molecule.compute_accessible_points()
 
-        accessible_points = []
-        for atom in molecule.atoms:
-            accessible_points.extend(atom.accessible_points_list)
-        
-        pts = Points(accessible_points, r=10, c="red")
-        spheres = [Sphere(pos=atom.coords, r=atom.radius + Atom.vdw_radius.get("water"))
-                    .alpha(0.15)
-                    .c("grey") for atom in molecule.atoms]
+    accessible_points = []
+    for atom in molecule.atoms:
+        accessible_points.extend(atom.accessible_points_list)
+    
+    pts = Points(accessible_points, r=10, c="red")
+    spheres = [Sphere(pos=atom.coords, r=atom.radius + Atom.vdw_radius.get("water"))
+                .alpha(0.15)
+                .c("grey") for atom in molecule.atoms]
 
-        coords = np.array([atom.coords for atom in molecule.atoms])
+    coords = np.array([atom.coords for atom in molecule.atoms])
 
-        xmin, ymin, zmin = coords.min(axis=0)
-        xmax, ymax, zmax = coords.max(axis=0)
+    xmin, ymin, zmin = coords.min(axis=0)
+    xmax, ymax, zmax = coords.max(axis=0)
 
-        axes = Axes(xrange=(xmin, xmax), yrange=(ymin, ymax), zrange=(zmin, zmax))
-        plotter = Plotter(axes = axes, bg = "white")
-        plotter.show(spheres, pts, axes = 1, viewup = "z", interactive = True)
+    axes = Axes(xrange=(xmin, xmax), yrange=(ymin, ymax), zrange=(zmin, zmax))
+    plotter = Plotter(axes = axes, bg = "white")
+    plotter.show(spheres, pts, axes = 1, viewup = "z", interactive = True)
