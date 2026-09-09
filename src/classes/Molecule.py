@@ -239,3 +239,5 @@ class Molecule:
             for residue in results:
                 for atom in residue['atoms']:
                     f.write(f"ATOM {atom['atom_num']:6d}  {atom['atom_name']:3s} {residue['resname']} {residue['chain']} {residue['resnum']:3d} {" "*27} {100 * atom['accessible_surface'] / atom['max_surface']:7.3f}\n")
+
+        print(f"Results exported at folder: {output_folder / self.name}")

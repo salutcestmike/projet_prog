@@ -2,3 +2,11 @@
 output/
 data/pdb
 naccess_results
+naccess_results
+naccess_batch.sh
+analysis_glob.sh
+analysis.sh
+filter_pdb_id.py
+
+src/analysis_glob.py
+src/analysis_prot.py
