@@ -1,10 +1,10 @@
-import pandas as pd
 from pathlib import Path
 
 
 with open(Path("data/pdb_ids.txt"), "r") as f:
-    ids = [int(line.strip()) for line in f.readlines()]
+    ids = [line.strip() for line in f.readlines()]
 print(ids)
+print(len(ids))
 # results = Path("output/results")
 # naccess_results = Path("output/naccess_results")
 
