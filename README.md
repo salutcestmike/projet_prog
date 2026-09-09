@@ -17,7 +17,7 @@ Outil Python d'analyse et de visualisation de structures protéiques (fichiers *
 
 ## Description
 
-Ce projet prend en entrée une structure protéique au format `.pdb` et :
+Ce projet prend en entrée une structure protéique au format `.pdb` ou un dossier contenant les fichiers `.pdb` et :
 
 1. place un ensemble de points répartis uniformément sur la sphère de chaque atome (nombre de points paramétrable via `-n`) ;
 2. détermine, pour chaque point, s'il est couvert (enfoui) ou non couvert (accessible) en fonction des atomes voisins, ce qui permet d'estimer la surface accessible au solvant (SASA) ;
@@ -77,7 +77,7 @@ Arguments :
 
 | Option | Description |
 |--------|-------------|
-| `-i`   | Chemin du fichier PDB en entrée |
+| `-i`   | Chemin du fichier PDB en entrée ou du dossier contenant les fichiers PDB à analyser |
 | `-o`   | Dossier de sortie pour les résultats |
 | `-n`   | Nombre de points échantillonnés par sphère atomique |
 
