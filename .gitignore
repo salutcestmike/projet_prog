@@ -5,6 +5,7 @@ naccess_results
 naccess_results
 naccess_batch.sh
 analysis_glob.sh
+analysis_prot.sh
 analysis.sh
 filter_pdb_id.py
 
