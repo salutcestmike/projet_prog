@@ -1,8 +1,13 @@
 from classes.Atom import Atom
 import numpy as np
 from typing import List, Optional
+import json
+
 
 class Residu:
+
+    with open('config/max_asa.json') as f:
+        max_asa = json.load(f)
 
     def __init__(self, resnum : int, resname : str, atoms : List[Atom], chain : Optional[str] = None,):
         self.resnum = resnum
@@ -31,7 +36,7 @@ class Residu:
 
     def get_max_surface(self, chain : Optional[str] = None) -> float:
         """
-        Computes the maximum surface area of the residue by summing the maximum surface areas of its atoms.
+        Computes the maximum surface area of the residue defined by the config/max_asa.json file.
         
         Args:
             chain (Optional[str]): The chain to which the residue belongs.
@@ -42,7 +47,7 @@ class Residu:
         # If a specific chain is provided and it does not match the residue's chain
         if chain is not None and self.chain != chain:
             return 0
-        return np.sum([atom.get_max_surface() for atom in self.atoms])
+        return Residu.max_asa.get(self.resname, 0)
 
     def get_surface_results(self, n_points : Optional[int] = None) -> dict:
         """

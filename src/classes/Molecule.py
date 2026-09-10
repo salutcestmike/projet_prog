@@ -218,9 +218,11 @@ class Molecule:
         
         # RSA file output
         with open(output_folder / self.name / f"{self.name}_rsa.txt", 'w') as f:
+            f.write("REM RES _ NUM      All-atoms\n")
+            f.write("REM                ABS   REL\n")
             for residue in results:
                 residue_surface = sum([atom['accessible_surface'] for atom in residue['atoms']])
-                residue_surface_percentage = 100 * residue_surface / sum([atom['max_surface'] for atom in residue['atoms']])
+                residue_surface_percentage = 100 * residue_surface / Residu.max_asa.get(residue['resname'], 1)
                 f.write(f"RES {residue['resname']} {residue['chain']} {residue['resnum']:3d} {residue_surface:8.2f} {residue_surface_percentage:5.1f}\n")
             f.write(f"END  Absolute sums over single chains surface\n")
 

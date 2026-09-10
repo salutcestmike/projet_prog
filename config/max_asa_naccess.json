@@ -1,0 +1,24 @@
+
+{
+    "_comment": "Max ASA values from https://raw.githubusercontent.com/evocellnet/int3dInterfaces/master/standard.data",
+    "ALA" : 107.95,
+    "CYS" : 134.28,
+    "ASP" : 140.39,
+    "GLU" : 172.25,
+    "PHE" : 199.48,
+    "GLY" :  80.10,
+    "HIS" : 182.88,
+    "ILE" : 175.12,
+    "LYS" : 200.81,
+    "LEU" : 178.63,
+    "MET" : 194.15,
+    "ASN" : 143.94,
+    "PRO" : 136.13,
+    "GLN" : 178.50,
+    "ARG" : 238.76,
+    "SER" : 116.50,
+    "THR" : 139.27,
+    "VAL" : 151.44,
+    "TRP" : 249.36,
+    "TYR" : 212.76
+}
